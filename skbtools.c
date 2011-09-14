@@ -303,10 +303,34 @@ void zufall_per_zeit(void) {
 // Implementation des nstr-Bereichs
 // --------------------------------
 
+char* nstring(const nstr t) {
+    return(t.str);
+}
 
-// Function: nstrnew
-// Implementation: This function creates the memorylocation for a new nstr - and adds an \0 to the nstr
-// Returns: pointer on the nstr structure
+int nstrlen(const nstr t) {
+    return(t.len);
+}
+
+bool nstrlencorr(nstr* t) {
+    if(t->len != (strlen(t->str) + 1)) {
+        t->len = strlen(t->str) + 1;
+        return false;
+    }
+    return true;
+}
+
+bool nstrcorr(nstr* t) {
+    if(t->len == (strlen(t->str) + 1)) // Alles okay
+        return true;
+    if(t->len > (strlen(t->str) + 1)) { // Es ist Information verloren gegangen, die Länge wird gekürzt.
+        t->len = strlen(t->str) + 1;
+        return false;
+    }
+    t->str[t->len - 1] = '\0'; // \0 wird an der gespeicherten Position erzwungen
+    t = nstrset(t, t->str); // Die Zeichenkette wird neu gesetzt, vermutlich an neuer Speicherstelle
+    return false;
+}
+
 nstr *nstrnew(const char *t) {
 	nstr *r = malloc(sizeof(nstr));
     if(!r) // NULL-Zeiger?
@@ -314,7 +338,7 @@ nstr *nstrnew(const char *t) {
     r->len = strlen(t) + 1; // Länge von t + 1 für das abschließende \0
 	char *n = malloc(r->len * sizeof(char));
     if(!n) {        // Kein Speicherplatz für Zeichenkette - Abbruch
-        r == NULL;  // r zum NULL-Pointer ändern
+        r = NULL;  // r zum NULL-Pointer ändern
         return(r);
     }
 	n = strncpy(n, t,  r->len - 1);
@@ -323,9 +347,6 @@ nstr *nstrnew(const char *t) {
 	return(r);
 }
 
-// Function nstrdel
-// Implementation free the memory from the nstr construction
-// Returns: true for full success - or false for partial or complete failure
 bool nstrdel(nstr *t) {
 	if(!t)	// NULL-Pointer-Behandlung
 		return false;
@@ -338,9 +359,6 @@ bool nstrdel(nstr *t) {
 	return true;
 }
 
-// Function nstradd
-// Implementation of a function,  that adds more chars to a existing nstr
-// Returns: pointer to the new nstr
 nstr *nstradd(nstr *t,  const char *c) {
 	int l = strlen(c);
 	char *cp;
@@ -358,23 +376,14 @@ nstr *nstradd(nstr *t,  const char *c) {
 	return(t);
 }
 
-// Function nstrcmp
-// Implementation of a function to compare 2 given strings
-// return: negativ if s1 < s2,  zero if s1  == s2,  positive if s1 > s2
 int nstrcmp(const nstr *s1, const nstr *s2) {
 	return(strcmp(s1->str, s2->str));
 }
 
-// Function nstrcoll
-// Implementation of a function to compare 2 given strings by LC_COLLATE
-// return: negativ if s1 < s2,  zero if s1  == s2,  positive if s1 > s2
 int nstrcoll(const nstr *s1, const nstr *s2) {
 	return(strcoll(s1->str, s2->str));
 }
 
-// Function nstrset
-// Implementation of a function,  that set's a new set of chars to an existing nstr
-// Returns: pointer to the new nstr
 nstr *nstrset(nstr *t,  const char *c) {
 	int l = strlen(c);
 	char *cp;
@@ -393,16 +402,10 @@ nstr *nstrset(nstr *t,  const char *c) {
 	return(t);
 }
 
-// Function nstrpbrk
-// Implementation of a function, that returns the pointer the first found char of a list,  or NULL
-// Returns: pointer to first found char or NULL
 char *nstrpbrk(nstr *t, const char *searchchars) {
 	return(strpbrk(t->str, searchchars));
 }
 
-// Function nstrrchr
-// Implementation of a function, that returns the pointer to the last found char,  or NULL
-// Returns: pointer to last found char or NULL
 char *nstrrchr(nstr *t, const int searchchar) {
 	return(strrchr(t->str, searchchar));
 }
@@ -411,10 +414,6 @@ char *nstrrchr(nstr *t, const int searchchar) {
 // Implementation des narr-Bereichs
 // --------------------------------
 
-
-// Function narrnew
-// Implementation: This function creates an array of strings
-// returns: pointer on the stringarraystructure
 narr *narrnew(const unsigned int n) {
 	narr *r = malloc(sizeof(narr));
 	if(!r) {
@@ -440,9 +439,6 @@ narr *narrnew(const unsigned int n) {
 	return(r);
 }
 
-// Function narrdel
-// Implementation: This function deletes a complete narr
-// returns: true if all went well and false something went wrong.
 bool narrdel(narr *t) {
 	bool ok = true; // Hält fest, ob alles glatt gegangen ist
 	if(!t) // NULL-Zeiger = Abbruch
@@ -457,9 +453,6 @@ bool narrdel(narr *t) {
 	return(ok);
 }
 
-// Function narradd
-// Implementation: This function adds some strings to a given narr
-// returns: pointer on the stringarraystructure or NULL-Pointer(busted)
 narr *narradd(narr *t,  const unsigned int n) {
 	nstr **cp; // for realloc
 
@@ -489,9 +482,6 @@ narr *narradd(narr *t,  const unsigned int n) {
 	return(t);
 }
 
-// Function narrrmv
-// Implementation: This function removes a nstr from a given narr
-// returns: bool true if all is okay or false if an error occured
 bool narrrmv(narr *t,  const unsigned int n) {
 	nstr *cp;
 

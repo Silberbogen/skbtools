@@ -39,6 +39,12 @@
  *
  *   Letze Änderungen:
  *   - 14.09.2011 Beginn an der Arbeit des Moduls
+ *                Es wurden die Prototypen
+ *                - nstring()
+ *                - nstrlen()
+ *                - nstrlencorr
+ *                - nstrcorr()
+ *                neu aufgenommen
  *
  * =====================================================================================
  */
@@ -162,6 +168,29 @@ void zufall_per_zeit(void);
 // -------------------------------
 // Prototypen für den nstr-Bereich
 // -------------------------------
+
+// Funktion: nstring
+// Implementation: Die Funktion gibt den reinen Zeichenketten-Teil des nstrings zurück
+// Rückgabe: Zeichenkette auf den Zeichenketten-Teil des nstrings oder NULL
+char* nstring(const nstr t);
+
+// Funktion: nstring-Länge
+// Implementation: Die Funktion gibt die Länge des nstrings zurück
+// Rückgabe: Länge der nstring-Zeichenkette
+int nstrlen(const nstr t);
+
+// Funktion: nstring-Länge korrekt? - sonst Veränderung des Größenfelds
+// Implementation: Überprüft die Länge des nstrings und korrigiert eventuell die gespeicherte Länge
+// Rückgabe: wahr:   Die Länge stimmte überein
+//           falsch: Die Länge stimmte nicht überein und wurde korrigiert.
+bool nstrlencorr(nstr* t);
+
+// Funktion: nstring-Länge korrekt? - sonst Veränderung der Zeichenkette
+// Implementation: Überprüft die Länge des nstrings und korrigiert eventuell die Zeichenkette
+// Hinweis: Es kann bei dieser Funktion zu einem Informationsverlust der Zeichenkette kommen.
+// Rückgabe: wahr:   Die Länge stimmte überein
+//           falsch: Die Länge stimmte nicht überein, der Fehler wurde korrigiert.
+bool nstrcorr(nstr* t);
 
 // Funktion: nstringnew
 // Implementation: Diese Funktion erstellt einen Speicherbereich für einen neuen nstring - und fügt automatisch ein \0 zur Beendigung hinzu.
