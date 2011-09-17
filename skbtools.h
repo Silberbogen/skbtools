@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.001
+ *        Version:  0.003
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:40:00
  *          Ended:  00.00.0000 00:00:00
@@ -44,6 +44,12 @@
  *                - nstrlen()
  *                - nstrlencorr
  *                - nstrcorr()
+ *                neu aufgenommen
+ *   - 17.09.2011 Es wurden die Prototypen
+ *                - nstrsave()
+ *                - nstrload()
+ *                - narrsave()
+ *                - narrload()
  *                neu aufgenommen
  *
  * =====================================================================================
@@ -241,6 +247,15 @@ char* nstrpbrk(nstr *ziel, const char *suchzeichenliste);
 //           ansonsten:  NULL
 char* nstrrchr(nstr *ziel, const int suchzeichen);
 
+// Funktion: nstringsave
+// Implementation: Funktion, die einen nstring text in eine Datei datei speichert
+int nstrsave(FILE *datei, nstr *text);
+
+// Funktion: nstringload
+// Implementation: Funktion, die einen nstring text aus der Datei datei ausliest
+// Rückgabe: Zeiger auf einen nstring
+nstr* nstrload(FILE *datei);
+
 // -------------------------------
 // Prototypen für den narr-Bereich
 // -------------------------------
@@ -258,7 +273,7 @@ narr* narrnew(const unsigned int anzahl);
 bool narrdel(narr *ziel);
 
 // Funktion: nstringarrayadd
-// Implementation: Funktion fügt einem bestehnden narr einen weitere anzahl nstrings hinzu und vergrößert damit das narr
+// Implementation: Funktion fügt einem bestehenden narr einen weitere anzahl nstrings hinzu und vergrößert damit das narr
 // Rückgabe: Bei Erfolg: Zeiger auf die geänderte narr-Struktur
 //           ansonsten:  NULL
 narr* narradd(narr *ziel,  const unsigned int anzahl);
@@ -268,6 +283,14 @@ narr* narradd(narr *ziel,  const unsigned int anzahl);
 // Rückgabe: Bei Erfolg: wahr
 //           ansonsten:  falsch
 bool narrrmv(narr *ziel,  const unsigned int index);
+
+// Funktion: nstringarraysave
+// Implementation: Funktion speichert ein vollständiges narr t in eine Datei d
+int narrsave(FILE *d, narr *t);
+
+// Funktion: nstringarrayload
+// Implementation: Funktion lädt ein vollständiges narr aus einer Datei d
+narr* narrload(FILE *d);
 
 #endif
 

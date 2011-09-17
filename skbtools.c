@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.003
+ *        Version:  0.005
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:42:00
  *          Ended:  00.00.0000 00:00:00
@@ -47,6 +47,11 @@
  *                neu aufgenommen
  *   - 17.09.2011 Textausgabe wurde vereinfacht
  *                Diverse Funktionen haben keine vordefinierte Farbwahl mehr
+ *                Neu programmierte Funktionen
+ *                - nstrsave()
+ *                - nstrload()
+ *                - narrsave()
+ *                - narrload()
  *
  * =====================================================================================
  */
@@ -413,6 +418,22 @@ char *nstrrchr(nstr *t, const int searchchar) {
 	return(strrchr(t->str, searchchar));
 }
 
+int nstrsave(FILE *d, nstr *t) {
+    fprintf(d, "%d\n", t->len);
+    return(fwrite(t->str, t->len, 1, d));
+}
+
+nstr* nstrload(FILE *d) {
+    char e[20];
+    int l;
+	fgets(e, 20, d);
+	l = atoi(e);
+	char *z = malloc(sizeof(char) * l);
+    fread(z, l, 1, d);
+    nstr *t = nstrnew(z);
+    return(t);
+}
+
 // --------------------------------
 // Implementation des narr-Bereichs
 // --------------------------------
@@ -503,3 +524,22 @@ bool narrrmv(narr *t,  const unsigned int n) {
 	return(true);
 }
 
+int narrsave(FILE *d, narr *t) {
+    if(!t->cnt)
+        return t->cnt;
+	fprintf(d, "%d\n", t->cnt);
+    for(int i = 0; i < t->cnt; ++i)
+        nstrsave(d, t->elm[i]);
+    return t->cnt;
+}
+
+narr* narrload(FILE *d) {
+    char e[20];
+    int l;
+	fgets(e, 20, d);
+	l = atoi(e);
+    narr *n = narrnew(l);
+    for(int i=0; i < l; ++i)
+        n->elm[i] = nstrload(d);
+    return(n);
+}
