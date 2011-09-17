@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.005
+ *        Version:  0.006
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:42:00
  *          Ended:  00.00.0000 00:00:00
@@ -52,6 +52,7 @@
  *                - nstrload()
  *                - narrsave()
  *                - narrload()
+ *                Änderung an den Funktionen nstring() und nstrlen() 
  *
  * =====================================================================================
  */
@@ -311,12 +312,12 @@ void zufall_per_zeit(void) {
 // Implementation des nstr-Bereichs
 // --------------------------------
 
-char* nstring(const nstr t) {
-    return(t.str);
+char* nstring(const nstr* t) {
+    return(t->str);
 }
 
-int nstrlen(const nstr t) {
-    return(t.len);
+int nstrlen(const nstr* t) {
+    return(t->len);
 }
 
 bool nstrlencorr(nstr* t) {

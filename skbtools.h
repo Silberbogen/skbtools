@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.003
+ *        Version:  0.004
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:40:00
  *          Ended:  00.00.0000 00:00:00
@@ -51,6 +51,7 @@
  *                - narrsave()
  *                - narrload()
  *                neu aufgenommen
+ *                Änderungen an den Prototypen von nstring() und nstrlen()
  *
  * =====================================================================================
  */
@@ -178,12 +179,12 @@ void zufall_per_zeit(void);
 // Funktion: nstring
 // Implementation: Die Funktion gibt den reinen Zeichenketten-Teil des nstrings zurück
 // Rückgabe: Zeichenkette auf den Zeichenketten-Teil des nstrings oder NULL
-char* nstring(const nstr t);
+char* nstring(const nstr* t);
 
 // Funktion: nstring-Länge
 // Implementation: Die Funktion gibt die Länge des nstrings zurück
 // Rückgabe: Länge der nstring-Zeichenkette
-int nstrlen(const nstr t);
+int nstrlen(const nstr* t);
 
 // Funktion: nstring-Länge korrekt? - sonst Veränderung des Größenfelds
 // Implementation: Überprüft die Länge des nstrings und korrigiert eventuell die gespeicherte Länge
