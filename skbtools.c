@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.001
+ *        Version:  0.002
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:42:00
  *          Ended:  00.00.0000 00:00:00
@@ -39,6 +39,12 @@
  *
  *   Letze Änderungen:
  *   - 14.09.2011 Beginn an der Arbeit des Moduls
+ *                Es wurden die Funktionen
+ *                - nstring()
+ *                - nstrlen()
+ *                - nstrlencorr
+ *                - nstrcorr()
+ *                neu aufgenommen
  *
  * =====================================================================================
  */
@@ -63,16 +69,16 @@ static int hfarbe = schwarz; // Hintergrundfarbe
 
 // Funktion: Beenden mit farbiger Statusmeldung
 void beenden(enum farben f, int status, char* text, ...) {
-    // Reservierung für den maximalen Speicherplatz, den resttext benötigt
+    // Reservierung für den maximalen Speicherplatz, den rest benötigt
     // -------------------------------------------------------------------
-    char *sicherheitszeiger = (char*) malloc( (sizeof(text) + 100) * sizeof(char));
-    if(!sicherheitszeiger) {
+    char *cp = (char*) malloc( (sizeof(text) + 100) * sizeof(char));
+    if(!cp) {
         vordergrundfarbe(rot);
         printw("Fehler!\nsicherheitszeiger in beenden() erhielt keinen Speicher!\n");
         vordergrundfarbe(weiss);
         exit(EXIT_FAILURE);
     }
-    char *umgewandeltertext = sicherheitszeiger;
+    char *umgewandeltertext = cp;
 
     // Verarbeitung der Parameterliste und Umwandlung der Parameter + Text zu einem String
     // -----------------------------------------------------------------------------------
@@ -83,9 +89,9 @@ void beenden(enum farben f, int status, char* text, ...) {
     // -----------------------------------------------------------------------------------
     
     hinweis(f, umgewandeltertext);
-    // Sicherheitszeiger löschen, sonst gibt es üble Speicherlöcher ;)
-    if(!sicherheitszeiger)
-        free(sicherheitszeiger);
+    // cp löschen, sonst gibt es üble Speicherlöcher ;)
+    if(!cp)
+        free(cp);
     exit(status);
 }
 
@@ -97,16 +103,16 @@ void hintergrundfarbe(enum farben hf) {
 
 // Funktion: Hinweis - für Fehlermeldungen oder ähnliches
 void hinweis(enum farben f, char* text, ...) {
-    // Reservierung für den maximalen Speicherplatz, den resttext benötigt
+    // Reservierung für den maximalen Speicherplatz, den rest benötigt
     // -------------------------------------------------------------------
-    char *sicherheitszeiger = (char*) malloc( (sizeof(text) + 100) * sizeof(char));
-    if(!sicherheitszeiger) {
+    char *cp = (char*) malloc( (sizeof(text) + 100) * sizeof(char));
+    if(!cp) {
         vordergrundfarbe(rot);
         printw("Fehler!\nsicherheitszeiger in hinweis() erhielt keinen Speicher!\n");
         vordergrundfarbe(weiss);
         exit(EXIT_FAILURE);
     }
-    char *umgewandeltertext = sicherheitszeiger;
+    char *umgewandeltertext = cp;
 
     // Verarbeitung der Parameterliste und Umwandlung der Parameter + Text zu einem String
     // -----------------------------------------------------------------------------------
@@ -118,19 +124,18 @@ void hinweis(enum farben f, char* text, ...) {
     
     vordergrundfarbe(f);
     textausgabe(umgewandeltertext);
-    vordergrundfarbe(weiss);
     weiter();
-    // Sicherheitszeiger löschen, sonst gibt es üble Speicherlöcher ;)
-    if(!sicherheitszeiger)
-        free(sicherheitszeiger);
+    // cp löschen, sonst gibt es üble Speicherlöcher ;)
+    if(!cp)
+        free(cp);
 }
 
 // Implementation: Ja-Nein-Frage
 bool janeinfrage(char *frage) {
 	char eingabe;
-	vordergrundfarbe(zyan);	textausgabe(frage);
+	
+    textausgabe(frage);
 	eingabe = taste();
-	vordergrundfarbe(weiss);
 	if((eingabe == 'j') || (eingabe == 'J'))
 		return true;
 	else
@@ -152,8 +157,8 @@ void ncurses_init(void (*funktion)()) {
         for(int x = schwarz; x <= weiss; x++)
           for(int y = schwarz; y <= weiss; y++)
             init_pair((8 * x) + y + 1, x, y);
-        vordergrundfarbe(weiss);
-        hintergrundfarbe(schwarz);
+    vordergrundfarbe(weiss);
+    hintergrundfarbe(schwarz);
 	clear(); // Bildschirm löschen
 	curs_set(0);
 	atexit(funktion); // Routine, die bei der Beendung ausgeführt wird
@@ -161,7 +166,6 @@ void ncurses_init(void (*funktion)()) {
 
 // Implementation: Taste
 char taste(void) {
-//	int puffergroesse;
 	char zeichen;
 
 	noecho();
@@ -172,77 +176,74 @@ char taste(void) {
 
 
 // Implementation: Textausgabe
-void textausgabe(char *gesamttext, ...) {
-	int zeilenlaenge = COLS; // COLS ist eine ncurses Variable
-	int maxzeilen = LINES; // LINES ist eine ncurses Variable
-
-	char textzeile[zeilenlaenge]; // Ausgabezeile
+void textausgabe(char *t, ...) {
+	char textzeile[COLS]; // Ausgabezeile
 	int i; // Schleifenzähler
 	int j; // Schleifenzähler
 	int zeile = 0;
 	bool erstausgabe = true;
 	int x, y; // Speichern die Bildschirmkoordinaten (für getyx)
 
-    // Reservierung für den maximalen Speicherplatz, den resttext benötigt
+    // Reservierung für den maximalen Speicherplatz, den rest benötigt
     // -------------------------------------------------------------------
-    char *sicherheitszeiger = (char*) malloc( (sizeof(gesamttext) + 100) * sizeof(char));
-    if(!sicherheitszeiger) {
+    char *cp = (char*) malloc( (sizeof(t) + 100) * sizeof(char));
+    if(!cp) {
         vordergrundfarbe(rot);
-        printw("Fehler!\nsicherheitszeiger in textausgabe() erhielt keinen Speicher!\n");
-        vordergrundfarbe(weiss);
+        printw("Fehler!\ncp in textausgabe() erhielt keinen Speicher!\n");
         exit(EXIT_FAILURE);
     }
-    char *resttext = sicherheitszeiger;
+    char *rest = cp;
     // -------------------------------------------------------------------
     
     // Verarbeitung der Parameterliste und Umwandlung der Parameter + Text zu einem String
     // -----------------------------------------------------------------------------------
     va_list par; // Parameterliste
-    va_start(par, gesamttext);
-    vsprintf(resttext, gesamttext, par);
+    va_start(par, t);
+    vsprintf(rest, t, par);
     va_end(par);
     // -----------------------------------------------------------------------------------
 
-	for(i = 0; i < zeilenlaenge; i++)
+	for(i = 0; i < COLS; i++)
 		textzeile[i] = '\0'; // Sicherheitslöschung, sonst gibt es Fehler bei der Leerzeilenausgabe
-	while(strlen(resttext) > (zeilenlaenge - 1)) {
-		for(i = (zeilenlaenge - 1); (*(resttext+i) != ' ') && (i > 0); i--);
+	while(strlen(rest) > (COLS - 1)) {
+		for(i = (COLS - 1); (*(rest+i) != ' ') && (i > 0); i--);
 		if(!i)
-			i = (zeilenlaenge - 1); // Das Wort ist so länger als die verdammte Zeile
-		for(j = 0; (*(resttext+j) != '\n') && (j < i); j++);
+			i = (COLS - 1); // Das Wort ist so länger als die verdammte Zeile
+		for(j = 0; (*(rest+j) != '\n') && (j < i); j++);
 		if(j < i)
 			i = j; // Auf das Zeilenendezeichen verkürzen
-		strncpy(textzeile, resttext, i); // Den Textteil kopieren
-		resttext += i+1;
-		while(*resttext == ' ')
-			resttext++;
+		strncpy(textzeile, rest, i); // Den Textteil kopieren
+		rest += i+1;
+		while(*rest == ' ')
+			rest++;
 		// Prüfen, ob wir in der vorletzten Zeile angekommen sind
 	  	getyx(stdscr, y, x); // Cursorposition feststellen
-		if((erstausgabe == true) && (y >= (maxzeilen - 1))) {
+		if((erstausgabe) && (y >= (LINES - 1))) {
 			weiter();
 			zeile = 0;
 			erstausgabe = false;
 		}
-		if(zeile == (maxzeilen - 1)) {
+		if(zeile == (LINES - 1)) {
 				weiter();
 				zeile = 0;
 		}
 		printw("%s\n", textzeile);
-		for(i = 0; i < zeilenlaenge; i++)
+		for(i = 0; i < COLS; i++)
 			textzeile[i] = '\0'; // Sicherheitslöschung, sonst gibt es Fehler bei der Leerzeilenausgabe
 		zeile += 1;
 	}
 	// Text ist kürzer als eine Zeile.
 	// Prüfen, ob wir in der vorletzten Zeile angekommen sind
-	if(zeile == (maxzeilen - 1)) {
+	if(zeile == (LINES - 1)) {
 			weiter();
 			zeile = 0;
 	}
-	printw("%s\n", resttext);
+//	printw("%s\n", rest); // altes System mit erzwungenem Zeilenende
+	printw("%s\n", rest); // neues System mit freiem Zeilenende - mehr printf-artig
 	refresh();
-    // Sicherheitszeiger löschen, sonst gibt es üble Speicherlöcher ;)
-    if(!sicherheitszeiger)
-        free(sicherheitszeiger);
+    // cp löschen, sonst gibt es üble Speicherlöcher ;)
+    if(!cp)
+        free(cp);
 }
 
 // Implementation: Texteingabe
