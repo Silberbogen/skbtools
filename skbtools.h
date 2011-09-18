@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.004
+ *        Version:  0.005
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:40:00
  *          Ended:  00.00.0000 00:00:00
@@ -52,6 +52,7 @@
  *                - narrload()
  *                neu aufgenommen
  *                Änderungen an den Prototypen von nstring() und nstrlen()
+ *   - 18.09.2011 Eine auskommentierte #include-Schablone wurde hinzugefügt
  *
  * =====================================================================================
  */
@@ -65,6 +66,43 @@
 #include <ncurses.h> // Farbige Grafische Ausgabe
 #include <locale.h>
 #include <stdarg.h> // Für die VA-Liste
+
+void beenden(enum farben f, int status, char* text, ...);
+void hintergrundfarbe(enum farben f);
+void hinweis(enum farben f, char* text, ...);
+void hinweis(enum farben f, char* text, ...);
+bool janeinfrage(char *text); // Funktion: Ja-Nein-Frage
+void ncurses_init(void (*)());
+char taste(void);
+void textausgabe(char *, ...);
+void texteingabe(char *text, unsigned int laenge);
+int waehle(char *text, int obergrenze);
+void weiter(void);
+
+int wuerfel(unsigned int seitenanzahl);
+void zufall_per_zeit(void);
+
+char* nstring(const nstr* t);
+int nstrlen(const nstr* t);
+bool nstrlencorr(nstr* t);
+bool nstrcorr(nstr* t);
+nstr* nstrnew(const char *zeichenkette);
+bool nstrdel(nstr *zeichenkette);
+nstr* nstradd(nstr *ziel,  const char *quelle);
+int nstrcmp(const nstr *string1, const nstr *string2);
+int nstrcoll(const nstr *string1, const nstr *string2);
+nstr* nstrset(nstr *ziel,  const char *quelle);
+char* nstrpbrk(nstr *ziel, const char *suchzeichenliste);
+char* nstrrchr(nstr *ziel, const int suchzeichen);
+int nstrsave(FILE *datei, nstr *text);
+nstr* nstrload(FILE *datei);
+
+narr* narrnew(const unsigned int anzahl);
+bool narrdel(narr *ziel);
+narr* narradd(narr *ziel,  const unsigned int anzahl);
+bool narrrmv(narr *ziel,  const unsigned int index);
+int narrsave(FILE *d, narr *t);
+narr* narrload(FILE *d);
 */
 
 #ifndef _SKBTOOLS_H_
