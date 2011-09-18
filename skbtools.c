@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.006
+ *        Version:  0.007
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:42:00
  *          Ended:  00.00.0000 00:00:00
@@ -53,6 +53,8 @@
  *                - narrsave()
  *                - narrload()
  *                Änderung an den Funktionen nstring() und nstrlen() 
+ *   - 18.09.2011 Neu programmierte Funktion
+ *                - auswahl()
  *
  * =====================================================================================
  */
@@ -74,6 +76,27 @@ static int hfarbe = schwarz; // Hintergrundfarbe
 // Implementation des ncurses-Bereichs
 // -----------------------------------
 
+// Implementation: Auswahl
+void auswahl(char* beschreibung, char* eingabeaufforderung, int maxzahl, ...) {
+	char eingabe[20];
+	int ergebnis = 0;
+	va_list zeiger;
+	// reserviere Platz für alle Auswahlmöglichkeiten
+	void (*fptr[maxzahl]) (void);
+	// Werte der VA-Liste in die Funktionszeiger kopieren
+	va_start(zeiger, maxzahl); // Die maxzahl Zeiger auslesen
+	for(int i=0; i < maxzahl; ++i)
+		fptr[i] = va_arg(zeiger, void*);
+	va_end(zeiger);
+
+	while((ergebnis < 1) || (ergebnis > maxzahl)) {
+		textausgabe(beschreibung);
+		textausgabe("Du wählst: ");
+        texteingabe(eingabe, 20);
+		ergebnis = atoi(eingabe);
+	}
+	fptr[ergebnis-1](); // Umwandlung menschliche Nummerierung in Arraynummerierung
+}
 
 // Funktion: Beenden mit farbiger Statusmeldung
 void beenden(enum farben f, int status, char* text, ...) {
@@ -247,7 +270,7 @@ void textausgabe(char *t, ...) {
 			zeile = 0;
 	}
 //	printw("%s\n", rest); // altes System mit erzwungenem Zeilenende
-	printw("%s\n", rest); // neues System mit freiem Zeilenende - mehr printf-artig
+	printw("%s", rest); // neues System mit freiem Zeilenende - mehr printf-artig
 	refresh();
     // cp löschen, sonst gibt es üble Speicherlöcher ;)
     if(!cp)

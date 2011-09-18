@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.005
+ *        Version:  0.006
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:40:00
  *          Ended:  00.00.0000 00:00:00
@@ -53,6 +53,8 @@
  *                neu aufgenommen
  *                Änderungen an den Prototypen von nstring() und nstrlen()
  *   - 18.09.2011 Eine auskommentierte #include-Schablone wurde hinzugefügt
+ *                Neuer Prototyp:
+ *                - auswahl()
  *
  * =====================================================================================
  */
@@ -67,6 +69,7 @@
 #include <locale.h>
 #include <stdarg.h> // Für die VA-Liste
 
+void auswahl(char *t, char *p, int n, ...);
 void beenden(enum farben f, int status, char* text, ...);
 void hintergrundfarbe(enum farben f);
 void hinweis(enum farben f, char* text, ...);
@@ -143,6 +146,10 @@ typedef struct _narr {
 // ----------------------------------
 // Prototypen für den ncurses-Bereich
 // ----------------------------------
+
+// Funktion: Auswahl
+// Implementation: Gibt einen Text t aus, zeigt den Prompt p an und nimmt n Parameter von Funktionen an, die zur Auswahl stehen
+void auswahl(char *t, char *p, int n, ...);
 
 // Funktion: Beenden des Programms
 // Implementation: Gibt eine farbige Meldung text in der Farbe f aus und beendet das Programm mit dem Status status
