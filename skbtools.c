@@ -7,7 +7,7 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.007
+ *        Version:  0.008
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:42:00
  *          Ended:  00.00.0000 00:00:00
@@ -55,6 +55,7 @@
  *                Änderung an den Funktionen nstring() und nstrlen() 
  *   - 18.09.2011 Neu programmierte Funktion
  *                - auswahl()
+ *                - Textattribute aus der texteingabe() entfernt, Prinzip: Vereinfachung
  *
  * =====================================================================================
  */
@@ -279,9 +280,9 @@ void textausgabe(char *t, ...) {
 
 // Implementation: Texteingabe
 void texteingabe(char *eingabe, unsigned int laenge) {
-  attrset(A_BOLD);
+//  attrset(A_BOLD);
   getnstr(eingabe, laenge);
-  attrset(A_NORMAL);
+//  attrset(A_NORMAL);
 }
 
 // Funktion: Vordergrundfarbe ändern
