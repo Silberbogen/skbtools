@@ -7,15 +7,15 @@
  *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
  *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.006
+ *        Version:  0.001
  *    letzte Beta:  0.000
  *        Created:  14.09.2011 11:40:00
  *          Ended:  00.00.0000 00:00:00
  *       Revision:  none
- *       Compiler:  clang
- *        compile:  Nicht zur eigentständigen Verwendung
+ *       Compiler:  c99/c11
+ *        compile:  make
  *
- *         Author:  Sascha K. Biermanns (saschakb), saschakb@gmail.com
+ *         Author:  Sascha K. Biermanns (skbierm), skbierm@gmail.com
  *        Company:
  *        License:  ISC
  *
@@ -45,16 +45,7 @@
  *                - nstrlencorr
  *                - nstrcorr()
  *                neu aufgenommen
- *   - 17.09.2011 Es wurden die Prototypen
- *                - nstrsave()
- *                - nstrload()
- *                - narrsave()
- *                - narrload()
- *                neu aufgenommen
- *                Änderungen an den Prototypen von nstring() und nstrlen()
- *   - 18.09.2011 Eine auskommentierte #include-Schablone wurde hinzugefügt
- *                Neuer Prototyp:
- *                - auswahl()
+ *   - 14.11.2012 Vereinfachung bei Strukturnamen, kleine Korrekturen
  *
  * =====================================================================================
  */
@@ -68,50 +59,17 @@
 #include <ncurses.h> // Farbige Grafische Ausgabe
 #include <locale.h>
 #include <stdarg.h> // Für die VA-Liste
-
-void auswahl(char *t, char *p, int n, ...);
-void beenden(enum farben f, int status, char* text, ...);
-void hintergrundfarbe(enum farben f);
-void hinweis(enum farben f, char* text, ...);
-void hinweis(enum farben f, char* text, ...);
-bool janeinfrage(char *text); // Funktion: Ja-Nein-Frage
-void ncurses_init(void (*)());
-char taste(void);
-void textausgabe(char *, ...);
-void texteingabe(char *text, unsigned int laenge);
-int waehle(char *text, int obergrenze);
-void weiter(void);
-
-int wuerfel(unsigned int seitenanzahl);
-void zufall_per_zeit(void);
-
-char* nstring(const nstr* t);
-int nstrlen(const nstr* t);
-bool nstrlencorr(nstr* t);
-bool nstrcorr(nstr* t);
-nstr* nstrnew(const char *zeichenkette);
-bool nstrdel(nstr *zeichenkette);
-nstr* nstradd(nstr *ziel,  const char *quelle);
-int nstrcmp(const nstr *string1, const nstr *string2);
-int nstrcoll(const nstr *string1, const nstr *string2);
-nstr* nstrset(nstr *ziel,  const char *quelle);
-char* nstrpbrk(nstr *ziel, const char *suchzeichenliste);
-char* nstrrchr(nstr *ziel, const int suchzeichen);
-int nstrsave(FILE *datei, nstr *text);
-nstr* nstrload(FILE *datei);
-
-narr* narrnew(const unsigned int anzahl);
-bool narrdel(narr *ziel);
-narr* narradd(narr *ziel,  const unsigned int anzahl);
-bool narrrmv(narr *ziel,  const unsigned int index);
-int narrsave(FILE *d, narr *t);
-narr* narrload(FILE *d);
 */
 
 #ifndef _SKBTOOLS_H_
 #define _SKBTOOLS_H_
 
 #include <ncurses.h>
+
+// Makro zur Erklärung statischer Variablen
+#define Staticdef( typ, variable, initwert) \
+	static typ variable = 0; \
+	if ( !(var) ) var = (initwert);
 
 // ----------------------------------------------------------
 // farben - kann ich mir leichter als die Originale merken ;)
@@ -127,33 +85,29 @@ enum farben { schwarz = COLOR_BLACK,
               weiss = COLOR_WHITE };
 
 // -----------------------------
-// Neuer Datentyp nstr (nstring)
+// Neuer Datentyp nstr_s (nstring)
 // -----------------------------
-typedef struct _nstr {
+typedef struct nstr_s {
 	unsigned int len;  // Die Länge der Zeichenkette, inklusive des \0
 	char *str; // Zeiger auf die Zeichenkette
-} nstr;
+} nstr_s;
 
 // ------------------------------------
-// Neuer Datentyp narr = Array von nstr
+// Neuer Datentyp narr_s = Array von nstr_s
 // ------------------------------------
 
-typedef struct _narr {
+typedef struct narr_s {
 	unsigned int cnt; // Die Größe des Feldes
-    nstr **elm; // Zeiger auf das Feld
-} narr;
+    nstr_s **elm; // Zeiger auf das Feld
+} narr_s;
 
 // ----------------------------------
 // Prototypen für den ncurses-Bereich
 // ----------------------------------
 
-// Funktion: Auswahl
-// Implementation: Gibt einen Text t aus, zeigt den Prompt p an und nimmt n Parameter von Funktionen an, die zur Auswahl stehen
-void auswahl(char *t, char *p, int n, ...);
-
 // Funktion: Beenden des Programms
 // Implementation: Gibt eine farbige Meldung text in der Farbe f aus und beendet das Programm mit dem Status status
-void beenden(enum farben f, int status, char* text, ...);
+void beenden(enum farben f, int status, char * text, ...);
 
 // Funktion: Hintergrundfarbe
 // Implementation: Setzt die Hintergrundfarbe auf den Farbwert f
@@ -162,14 +116,14 @@ void hintergrundfarbe(enum farben f);
 // Funktion: Hinweis
 // Implementation: Gibt eine Meldung text in der Farbe f aus und wartet anschließend auf einen Tastendruck.
 // Hinweis: Die Vordergrundfarbe des Textes ist nach Rückkehr aus der Funktion Weiss
-void hinweis(enum farben f, char* text, ...);
+void hinweis(enum farben f, char * text, ...);
 
 // Funktion: Ja/Nein-Frage
 // Implementation: Gibt den Text text auf dem Bildschirm aus und wartet auf die Antwort
 // Hinweis: Man muß ausschließlich 'j' oder 'J' tippen zum bestätigen, sonst ist die Antwort NEIN.
 // Rückgabe: Bei 'j' oder 'J': wahr
 //           ansonsten:        falsch
-bool janeinfrage(char *text); // Funktion: Ja-Nein-Frage
+bool janeinfrage(char * text); // Funktion: Ja-Nein-Frage
 
 // Funktion: ncurses_initialisierung
 // Implementation: Initialisiert ncurses auf die von mir üblicherweise gewünschte Art.
@@ -188,7 +142,7 @@ void textausgabe(char *, ...);
 // Funktion: Texteingabe
 // Implementation: Erlaubt das eingeben einer Zeichenkette text mit einer vorgegebenen Länge.
 // Hinweis: Die Länge kann NICHT überschritten werden. Die Eingabe erfolgt bei eingeschaltetem FETT-Attribut des Textes.
-void texteingabe(char *text, unsigned int laenge);
+void texteingabe(char * text, unsigned int laenge);
 
 // Funktion: Vordergrundfarbe
 // Implementation: Setzt die Vordergrundfarbe grundfarbe auf den Farbwert f
@@ -197,7 +151,7 @@ void vordergrundfarbe(enum farben f);
 // Funktion: Wähle
 // Implementation: Die Funktion gibt den Text text aus und erlaubt die Eingabe einer numerischen Auswahl zwischen 1 und der Obergrenze.
 // Implementation: Die Eingabe wird wiederholt, bis das eingegebene Ergebnis im Bereich zwischen 1 und der Obergrenze liegt.
-int waehle(char *text, int obergrenze);
+int waehle(char * text, int obergrenze);
 
 // Funktion: Weiter
 // Implementation: Die Funktion gibt einen Text aus, der anzeigt, das eine beliebige Taste zum Fortfahren gedrückt werden soll.
@@ -218,125 +172,108 @@ int wuerfel(unsigned int seitenanzahl);
 void zufall_per_zeit(void);
 
 // -------------------------------
-// Prototypen für den nstr-Bereich
+// Prototypen für den nstr_s-Bereich
 // -------------------------------
 
 // Funktion: nstring
 // Implementation: Die Funktion gibt den reinen Zeichenketten-Teil des nstrings zurück
 // Rückgabe: Zeichenkette auf den Zeichenketten-Teil des nstrings oder NULL
-char* nstring(const nstr* t);
+char * nstring(const nstr_s t);
 
 // Funktion: nstring-Länge
 // Implementation: Die Funktion gibt die Länge des nstrings zurück
 // Rückgabe: Länge der nstring-Zeichenkette
-int nstrlen(const nstr* t);
+int nstrlen(const nstr_s t);
 
 // Funktion: nstring-Länge korrekt? - sonst Veränderung des Größenfelds
 // Implementation: Überprüft die Länge des nstrings und korrigiert eventuell die gespeicherte Länge
 // Rückgabe: wahr:   Die Länge stimmte überein
 //           falsch: Die Länge stimmte nicht überein und wurde korrigiert.
-bool nstrlencorr(nstr* t);
+bool nstrlencorr(nstr_s * t);
 
 // Funktion: nstring-Länge korrekt? - sonst Veränderung der Zeichenkette
 // Implementation: Überprüft die Länge des nstrings und korrigiert eventuell die Zeichenkette
 // Hinweis: Es kann bei dieser Funktion zu einem Informationsverlust der Zeichenkette kommen.
 // Rückgabe: wahr:   Die Länge stimmte überein
 //           falsch: Die Länge stimmte nicht überein, der Fehler wurde korrigiert.
-bool nstrcorr(nstr* t);
+bool nstrcorr(nstr_s * t);
 
 // Funktion: nstringnew
 // Implementation: Diese Funktion erstellt einen Speicherbereich für einen neuen nstring - und fügt automatisch ein \0 zur Beendigung hinzu.
 // Vorteil: Jeder nstring ist mit /0 abgeschlossen
 // Rückgabe: Bei Erfolg: Zeiger auf die nstring-Struktur
 //           ansonsten:  NULL
-nstr* nstrnew(const char *zeichenkette);
+nstr_s * nstrnew(const char * zeichenkette);
 
 // Funktion:  nstringdelete
 // Implementation: Gibt den von der nstring-Struktur belegten Speicher wieder frei
 // Rückgabe: wahr bei vollem Erfolg - falsch deutet an, das es zu einem teilweisen oder vollständigen Fehler kam
-bool nstrdel(nstr *zeichenkette);
+bool nstrdel(nstr_s * zeichenkette);
 
 // Funktion:  nstringadd
 // Implementation: Funktion, die weitere Zeichen an einen bereits vorhanden nstring anfügt
 // Vorteil: Der nstring wird wieder korrekt mit /0 abgeschlossen
 // Rückgabe: Zeiger auf den neuen Speicherort von nstring
-nstr* nstradd(nstr *ziel,  const char *quelle);
+nstr_s * nstradd(nstr_s * ziel,  const char * quelle);
 
 // Funktion:  nstringcompare
 // Implementation: Vergleich zweier gegebener nstrings
 // Rückgabe: Negativ, wenn string1 <  string2 ist
 //           Null,    wenn string1 == string2 ist
 //           Positiv, wenn string1 >  string2 ist
-int nstrcmp(const nstr *string1, const nstr *string2);
+int nstrcmp(const nstr_s * string1, const nstr_s * string2);
 
 // Funktion: nstringcollate
 // Implementation: Funktion, die 2 gegeben nstrings mittels LC_COLLATE vergleicht
 // Rückgabe: Negativ, wenn string1 <  string2 ist
 //           Null,    wenn string1 == string2 ist
 //           Positiv, wenn string1 >  string2 ist
-int nstrcoll(const nstr *string1, const nstr *string2);
+int nstrcoll(const nstr_s * string1, const nstr_s * string2);
 
 // Funktion: nstringset
 // Implementation: Funktion, die einen bereits existenten nstring mit neuen Zeichen überschreibt
 // Rückgabe: Zeiger auf den neuen nstring
-nstr* nstrset(nstr *ziel,  const char *quelle);
+nstr_s * nstrset(nstr_s * ziel,  const char * quelle);
 
 // Funktion: nstringfindfirstchar
 // Implementation: Funktion, die das Auftreten des ersten Zeichens aus einer Liste ermittelt
 // Rückgabe: Bei Erfolg: Zeiger auf das erste gefundene Zeichen
 //           ansonsten:  NULL
-char* nstrpbrk(nstr *ziel, const char *suchzeichenliste);
+char * nstrpbrk(nstr_s * ziel, const char * suchzeichenliste);
 
 // Funktion: nstringfindlastchar
 // Implementation: Funktion, die nach dem letzten Auftreten des Zeichens sucht
 // Rückgabe: Bei Erfolg: Zeiger auf das letzte Vorkommen des Zeichens
 //           ansonsten:  NULL
-char* nstrrchr(nstr *ziel, const int suchzeichen);
-
-// Funktion: nstringsave
-// Implementation: Funktion, die einen nstring text in eine Datei datei speichert
-int nstrsave(FILE *datei, nstr *text);
-
-// Funktion: nstringload
-// Implementation: Funktion, die einen nstring text aus der Datei datei ausliest
-// Rückgabe: Zeiger auf einen nstring
-nstr* nstrload(FILE *datei);
+char * nstrrchr(nstr_s * ziel, const int suchzeichen);
 
 // -------------------------------
-// Prototypen für den narr-Bereich
+// Prototypen für den narr_s-Bereich
 // -------------------------------
 
 // Funktion: nstringarraynew
 // Implementation: Erstellt ein Feld (Array) von nstrings der Größe anzahl
-// Rückgabe: Bei Erfolg: Zeiger auf die narr-Struktur
+// Rückgabe: Bei Erfolg: Zeiger auf die narr_s-Struktur
 //           ansonsten: NULL
-narr* narrnew(const unsigned int anzahl);
+narr_s * narrnew(const unsigned int anzahl);
 
 // Funktion: nstringarraydelete
-// Implementation: Funktion, die ein bestehendes narr löscht
+// Implementation: Funktion, die ein bestehendes narr_s löscht
 // Rückgabe: Bei Erfolg: wahr
 //           ansonsten:  falsch
-bool narrdel(narr *ziel);
+bool narrdel(narr_s * ziel);
 
 // Funktion: nstringarrayadd
-// Implementation: Funktion fügt einem bestehenden narr einen weitere anzahl nstrings hinzu und vergrößert damit das narr
-// Rückgabe: Bei Erfolg: Zeiger auf die geänderte narr-Struktur
+// Implementation: Funktion fügt einem bestehnden narr_s einen weitere anzahl nstrings hinzu und vergrößert damit das narr_s
+// Rückgabe: Bei Erfolg: Zeiger auf die geänderte narr_s-Struktur
 //           ansonsten:  NULL
-narr* narradd(narr *ziel,  const unsigned int anzahl);
+narr_s * narradd(narr_s * ziel,  const unsigned int anzahl);
 
 // Funktion: nstringarrayremove
-// Implementation: Funktion, die das Element index aus dem narr entfernt und das narr verkleinert.
+// Implementation: Funktion, die das Element index aus dem narr_s entfernt und das narr_s verkleinert.
 // Rückgabe: Bei Erfolg: wahr
 //           ansonsten:  falsch
-bool narrrmv(narr *ziel,  const unsigned int index);
+bool narrrmv(narr_s *ziel,  const unsigned int index);
 
-// Funktion: nstringarraysave
-// Implementation: Funktion speichert ein vollständiges narr t in eine Datei d
-int narrsave(FILE *d, narr *t);
-
-// Funktion: nstringarrayload
-// Implementation: Funktion lädt ein vollständiges narr aus einer Datei d
-narr* narrload(FILE *d);
-
-#endif
+#endif // _SKBTOOLS_H_
 
