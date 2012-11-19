@@ -46,6 +46,7 @@
  *                - nstrcorr()
  *                neu aufgenommen
  *   - 14.11.2012 Vereinfachung bei Strukturnamen, kleine Korrekturen
+ * 	 - 19.11.2012 enum Konstanten korrigiert
  *
  * =====================================================================================
  */
@@ -75,14 +76,14 @@
 // farben - kann ich mir leichter als die Originale merken ;)
 // ----------------------------------------------------------
 
-enum farben { schwarz = COLOR_BLACK,
-              rot = COLOR_RED,
-              gruen = COLOR_GREEN,
-              gelb = COLOR_YELLOW,
-              blau = COLOR_BLUE,
-              magenta = COLOR_MAGENTA,
-              zyan = COLOR_CYAN,
-              weiss = COLOR_WHITE };
+enum farben { FARBE_SCHWARZ = COLOR_BLACK,
+              FARBE_ROT = COLOR_RED,
+              FARBE_GRUEN = COLOR_GREEN,
+              FARBE_GELB = COLOR_YELLOW,
+              FARBE_BLAU = COLOR_BLUE,
+              FARBE_MAGENTA = COLOR_MAGENTA,
+              FARBE_ZYAN = COLOR_CYAN,
+              FARBE_WEISS = COLOR_WHITE };
 
 // -----------------------------
 // Neuer Datentyp nstr_s (nstring)
@@ -132,7 +133,7 @@ void ncurses_init(void (*)());
 // Funktion: Taste
 // Implementation: Schaltet die Echo-Funktion aus und wartet auf einen Tastendruck, anschließend wird das Echo wieder eingeschaltet
 // Rückgabe: Die gedrückte Taste
-char taste(void);
+int taste(void);
 
 // Funktion: Textausgabe
 // Implementation: Erlaubt die Ausgabe eines Textes auf dem Bildschirm. Die Ausgabe erfolgt in der von Vordergrundfarbe und Hintergrundfarbe ausgewählten Farbwahl. Die Ausgabe kann nach Art des printf-Mechanismus formatiert werden.
