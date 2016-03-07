@@ -4,13 +4,9 @@
  *       Filename:  skbtools.h
  *
  *    Description:  saschakb toolbox - Sammlung für ncurses-gestützte Anwendungen
- *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
- *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
- *        Version:  0.001
- *    letzte Beta:  0.000
+ *        Version:  0.002
  *        Created:  14.09.2011 11:40:00
- *          Ended:  00.00.0000 00:00:00
  *       Revision:  none
  *       Compiler:  c99/c11
  *        compile:  make
@@ -19,7 +15,7 @@
  *        Company:
  *        License:  ISC
  *
- *   Copyright (C)  2011, Sascha K. Biermanns
+ *   Copyright (C)  2011-2016, Sascha K. Biermanns
  *
  * ====================================================================================
  *
@@ -47,21 +43,10 @@
  *                neu aufgenommen
  *   - 14.11.2012 Vereinfachung bei Strukturnamen, kleine Korrekturen
  * 	 - 19.11.2012 enum Konstanten korrigiert
- *   
+ *   - 07.03.2016 Hinzufügen einer Makros
  *
  * =====================================================================================
  */
-
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <time.h> // Zufallsgenerator
-#include <string.h>
-#include <ncurses.h> // Farbige Grafische Ausgabe
-#include <locale.h>
-#include <stdarg.h> // Für die VA-Liste
-*/
 
 #ifndef _SKBTOOLS_H_
 #define _SKBTOOLS_H_
@@ -75,6 +60,28 @@
 
 // Makro zur Nutzung von SWAP
 #define SWAP(a,b) swap(&(a),&(b),sizeof(a))
+
+// Makro zum ermitteln der Anzahl N an Elementen a
+#define NELEM(a) (sizeof(a) / sizeof(a[0]))
+
+// FOR-Schleife, die ab 0 zählt, bis N erreicht ist
+#define FOR0(x, n) for(int x=0; x < n; x++)
+
+// FOR-Schleife, die ab 1 zählt, bis N erreicht ist
+#define FOR1(x, n) for(int x=1; x < n; x++)
+
+// TEST-Routine: Wenn die Bedingung cond nicht erfolgt, wird ein Fehler der die Datei und Zeile ausgibt, erzeugt
+#define EXPECT(cond) if (!(cond)) { fprintf(stderr, "%s:%d: FAIL\n", __FILE__, __LINE__) }
+
+// MAX liefert den größeren Wert aus A und B zurück
+#define MAX(A, B)               ((A) > (B) ? (A) : (B))
+
+// MIN liefert den kleineren Wert aus A und B zurück
+#define MIN(A, B)               ((A) < (B) ? (A) : (B))
+
+// BETWEEN prüft ob X zwischen A und B liegt
+#define BETWEEN(X, A, B)        ((A) <= (X) && (X) <= (B))
+
 
 // -----------
 // Algorithmen

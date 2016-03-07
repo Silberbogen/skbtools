@@ -4,8 +4,6 @@
  *       Filename:  skbtools.c
  *
  *    Description:  saschakb tools - Sammlung für ncurses-Anwendungen
- *    				Dieser Quelltext versucht die Fähigkeiten von C auszuschöpfen, daher
- *    				ist C99 oder neuer notwendig, um ihn zu kompilieren.
  *
  *        Version:  0.003
  *    letzte Beta:  0.000
@@ -19,7 +17,7 @@
  *        Company:
  *        License:  ISC
  *
- *   Copyright (C)  2011, Sascha K. Biermanns
+ *   Copyright (C)  2011-2016, Sascha K. Biermanns
  *
  * ====================================================================================
  *
