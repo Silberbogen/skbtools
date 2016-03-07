@@ -170,8 +170,8 @@ void ncurses_init( void (*funktion)() ) {
 		for(int y = FARBE_SCHWARZ; y <= FARBE_WEISS; ++y)
 			init_pair((8 * x) + y + 1, x, y);
 	// Standardfarben setzen
-    vordergrundfarbe(FARBE_WEISS);
-    hintergrundfarbe(FARBE_SCHWARZ);
+   vordergrundfarbe(FARBE_WEISS);
+   hintergrundfarbe(FARBE_SCHWARZ);
 	clear(); // Bildschirm löschen
 	curs_set(0); // Cursor in die linke obere Ecke
 	atexit( funktion ); // Routine, die bei der Beendung ausgeführt wird
@@ -303,8 +303,11 @@ char * str_strip(const char * s) {
     if ( p ) {
     	char * p2 = p;
     	while ( * s != '\0' )
-			if ( * s != '\t' && * s != '\n' && * s != '\v' ) *p2++ = *s++; else ++s;
-    	* p2 = '\0';	
+			if ( * s != '\t' && * s != '\n' && * s != '\v' )
+            *p2++ = *s++;
+         else
+            ++s;
+    	*p2 = '\0';	
     }
     return p;
 }
